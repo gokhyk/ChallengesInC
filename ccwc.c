@@ -4,7 +4,6 @@ In this step your goal is to write a simple version of wc, let’s call it ccwc
 (cc for Coding Challenges) that takes the command line option -c and outputs 
 the number of bytes in a file.
 */
-
 /*
 Step Two
 In this step your goal is to support the command line option -l that outputs 
@@ -16,13 +15,18 @@ Step Three
 In this step your goal is to support the command line option -w that outputs 
 the number of words in a file. If you’ve done it right your output should match this:
 */
-
 /*
 Step Four
 In this step your goal is to support the command line option -m that outputs the number 
 of characters in a file. If the current locale does not support multibyte characters this 
 will match the -c option.
 You can learn more about programming for locales here
+*/
+/*
+Step Five
+In this step your goal is to support the default option - i.e. no options are provided, 
+which is the equivalent to the -c, -l and -w options. If you’ve done it right your output 
+should match this:
 */
 
 #include <stdio.h>
@@ -84,6 +88,7 @@ void count_file(FILE *fp, Count *count) {
             count->chars++;
             memset(&ps, 0, sizeof(ps));
         }
+        
         if (ch == '\n') {
             count->lines++;
         }
@@ -103,13 +108,14 @@ void count_file(FILE *fp, Count *count) {
 }
 
 void print_count(Count count, Flag flag) {
-    if (flag.bytes == 1)
+    int no_flags = flag.bytes || flag.lines || flag.words || flag.chars;
+    if (!no_flags || flag.bytes == 1)
         printf("%8ld", count.bytes);
-    if (flag.lines == 1)
+    if (!no_flags || flag.lines == 1)
         printf("%8ld", count.lines);
-    if (flag.words == 1)
+    if (!no_flags || flag.words == 1)
         printf("%8ld", count.words);
-    if (flag.chars == 1)
+    if (no_flags || flag.chars == 1)
         printf("%8ld", count.chars);
 } 
 
