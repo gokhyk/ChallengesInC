@@ -28,6 +28,11 @@ In this step your goal is to support the default option - i.e. no options are pr
 which is the equivalent to the -c, -l and -w options. If you’ve done it right your output 
 should match this:
 */
+/*
+The Final Step
+In this step your goal is to support being able to read from standard input if no filename 
+is specified. If you’ve done it right your output should match this:
+*/
 
 #include <stdio.h>
 #include <string.h>
@@ -88,7 +93,7 @@ void count_file(FILE *fp, Count *count) {
             count->chars++;
             memset(&ps, 0, sizeof(ps));
         }
-        
+
         if (ch == '\n') {
             count->lines++;
         }
@@ -115,26 +120,19 @@ void print_count(Count count, Flag flag) {
         printf("%8ld", count.lines);
     if (!no_flags || flag.words == 1)
         printf("%8ld", count.words);
-    if (no_flags || flag.chars == 1)
+    if (flag.chars == 1)
         printf("%8ld", count.chars);
 } 
 
 
 int main(int argc, char *argv[]) {
 
-    if (argc < 2) {
-        print_usage();
-        return 1;
-    } else if (argc == 2 && argv[1][0] == '-') {
-        print_usage();
-        return 1;        
-    }
 
     int i = 1;
-    Flag flag = {0, 0, 0};
-    Count count = {0, 0, 0};
+    Flag flag = {0, 0, 0, 0};
+    Count count = {0, 0, 0, 0};
 
-    while (i < argc) {
+    while (i <= argc) {
 
         if (argv[i] != NULL && argv[i][0] == '-') {
             if (strcmp(argv[i], "-c") == 0)
@@ -164,7 +162,9 @@ int main(int argc, char *argv[]) {
 
 
         } else {
-            print_usage();
+            count_file(stdin, &count);
+            print_count(count, flag);
+            printf("\n");            
         }
         i++;
     }
