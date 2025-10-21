@@ -4,20 +4,6 @@ In this step your goal is to write a simple version of wc, let’s call it ccwc
 (cc for Coding Challenges) that takes the command line option -c and outputs 
 the number of bytes in a file.
 */
-
-/*
-Step Two
-In this step your goal is to support the command line option -l that outputs the number of lines in a file.
-If you’ve done it right your output should match this:
->ccwc -l test.txt
-    7145 test.txt
-*//*
-Step One
-In this step your goal is to write a simple version of wc, let’s call it ccwc 
-(cc for Coding Challenges) that takes the command line option -c and outputs 
-the number of bytes in a file.
-*/
-
 /*
 Step Two
 In this step your goal is to support the command line option -l that outputs 
@@ -33,13 +19,20 @@ the number of words in a file. If you’ve done it right your output should matc
 >ccwc -w test.txt
    58164 test.txt
 */
-
 /*
 Step Four
 In this step your goal is to support the command line option -m that outputs the number 
 of characters in a file. If the current locale does not support multibyte characters this 
 will match the -c option.
 For this one your answer will depend on your locale, so if can, use wc itself and compare the output to your solution:
+*/
+/*
+Step Five
+In this step your goal is to support the default option - i.e. no options are provided, 
+which is the equivalent to the -c, -l and -w options. If you’ve done it right your output 
+should match this:
+>ccwc test.txt
+    7145   58164  342190 test.txt
 */
 
 #include <stdio.h>
@@ -99,6 +92,7 @@ void count_file(FILE *fp, Count *count) {
             count->chars++;
             memset(&ps, 0, sizeof(ps));
         }
+        
         if (ch == '\n') {
             count->lines++;
         }
@@ -118,13 +112,14 @@ void count_file(FILE *fp, Count *count) {
 }
 
 void print_count(Count count, Flag flag) {
-    if (flag.bytes == 1)
+    int no_flags = flag.bytes || flag.lines || flag.words || flag.chars;
+    if (!no_flags || flag.bytes == 1)
         printf("%8ld", count.bytes);
-    if (flag.lines == 1)
+    if (!no_flags || flag.lines == 1)
         printf("%8ld", count.lines);
-    if (flag.words == 1)
+    if (!no_flags || flag.words == 1)
         printf("%8ld", count.words);
-    if (flag.chars == 1)
+    if (no_flags || flag.chars == 1)
         printf("%8ld", count.chars);
 } 
 
@@ -153,93 +148,6 @@ int main(int argc, char *argv[]) {
                 flag.words = 1;
             else if (strcmp(argv[i], "-m") == 0)
                 flag.chars = 1;
-            else {
-                print_usage();
-                return 1;
-            }
-        } else if (argv[i] != NULL) {
-            const char *filename = argv[i];
-            FILE *file = fopen(filename, "rb");
-            if (!file) {
-                perror("Error opening file");
-                return 1;
-            }
-
-            count_file(file, &count);
-            print_count(count, flag);
-
-            printf("  %-s\n", filename);
-
-
-        } else {
-            print_usage();
-        }
-        i++;
-    }
-    return 0;
-}   
-
-#include <stdio.h>
-#include <string.h>
-
-typedef struct {
-    long bytes;
-    long lines;
-} Count;
-
-typedef struct {
-    int bytes;
-    int lines;
-} Flag;
-
-void print_usage() {
-    printf("Usage: ccwc -c -l <filename>\n");
-    printf("Counts the number of bytes in the specified file.\n");
-}
-
-void count_file(FILE *fp, Count *count) {
-    count->bytes = 0;
-    count->lines = 0;
-
-    int ch;
-
-    while ((ch = fgetc(fp)) != EOF) {
-        
-        count->bytes++;
-        if (ch == '\n') {
-            count->lines++;
-        }
-    }
-}
-
-void print_count(Count count, Flag flag) {
-    if (flag.bytes == 1)
-        printf("%8ld", count.bytes);
-    if (flag.lines == 1)
-        printf("%8ld", count.lines);
-} 
-
-int main(int argc, char *argv[]) {
-
-    if (argc < 2) {
-        print_usage();
-        return 1;
-    } else if (argc == 2 && argv[1][0] == '-') {
-        print_usage();
-        return 1;        
-    }
-
-    int i = 1;
-    Flag flag = {0,0};
-    Count count = {0,0};
-
-    while (i < argc) {
-
-        if (argv[i] != NULL && argv[i][0] == '-') {
-            if (strcmp(argv[i], "-c") == 0)
-                flag.bytes = 1;
-            else if (strcmp(argv[i], "-l") == 0)
-                flag.lines = 1;
             else {
                 print_usage();
                 return 1;
