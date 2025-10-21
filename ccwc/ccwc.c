@@ -45,11 +45,15 @@ int main(int argc, char *argv[]) {
             }
 
             int ch;
-            while ((ch = fgetc(file)) != EOF)
-                byte_count++;
+            if (byte_count_flag) {
+                while ((ch = fgetc(file)) != EOF)
+                    byte_count++;
 
-            printf("%10d", byte_count);
-            printf("  %-s\n", filename);
+                printf("%10d", byte_count);
+                printf("  %-s\n", filename);
+            } else {
+                print_usage();
+            }
 
         } else {
             print_usage();
